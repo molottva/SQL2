@@ -1,22 +1,18 @@
 package ru.netology.test;
 
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import ru.netology.data.CardData;
-import ru.netology.data.TransferData;
-import ru.netology.data.UserData;
-import ru.netology.data.UserVerifyData;
+import ru.netology.helper.DataHelper;
 
 import static org.testng.AssertJUnit.assertEquals;
 import static ru.netology.helper.APIHelper.*;
 import static ru.netology.helper.SQLHelper.*;
 
 public class TransferTest {
-    UserData user;
+    DataHelper.UserData user;
     String token;
-    CardData[] cards;
+    DataHelper.CardData[] cards;
     int indexCartTo;
     int indexCartFrom;
     int balanceCartTo;
@@ -25,13 +21,14 @@ public class TransferTest {
     @BeforeMethod
     public void setUp() {
         reloadVerifyCodeTable();
-        user = new UserData();
+        user = DataHelper.getUser();
         auth(user);
-        var verifyData = new UserVerifyData(user.getLogin(), getVerifyCodeByLogin(user.getLogin()));
+        var verifyData = DataHelper.getValidCode(user.getLogin());
+//        var verifyData = new UserVerifyData(user.getLogin(), getVerifyCodeByLogin(user.getLogin()));
         token = verification(verifyData);
         cards = getCards(token);
         int i = 0;
-        for (CardData card : cards) {
+        for (DataHelper.CardData card : cards) {
             card.setNumber(getNumberCardById(card.getId()));
             i++;
         }
@@ -43,10 +40,10 @@ public class TransferTest {
         reloadBalanceCards(cards[indexCartFrom].getId(), balanceCartFrom);
     }
 
-    @AfterClass
-    public void setDown() {
-        setDown();
-    }
+//    @AfterClass
+//    public void setDown() {
+//        setDown();
+//    }
 
     @Test
     public void shouldTransferHappyPath() {
@@ -56,7 +53,7 @@ public class TransferTest {
         balanceCartFrom = Integer.parseInt(cards[indexCartFrom].getBalance());
         int amount = balanceCartFrom / 2;
 
-        var transferData = new TransferData(cards[indexCartFrom].getNumber(),
+        var transferData = new DataHelper.TransferData(cards[indexCartFrom].getNumber(),
                 cards[indexCartTo].getNumber(), String.valueOf(amount));
         transfer(transferData, token);
         assertEquals(balanceCartTo + amount, getBalanceCardById(cards[indexCartTo].getId()));
@@ -72,7 +69,7 @@ public class TransferTest {
         balanceCartFrom = Integer.parseInt(cards[indexCartFrom].getBalance());
         int amount = -1;
 
-        var transferData = new TransferData(cards[indexCartFrom].getNumber(),
+        var transferData = new DataHelper.TransferData(cards[indexCartFrom].getNumber(),
                 cards[indexCartTo].getNumber(), String.valueOf(amount));
         transfer(transferData, token);
         assertEquals(balanceCartTo, getBalanceCardById(cards[indexCartTo].getId()));
@@ -87,7 +84,7 @@ public class TransferTest {
         balanceCartFrom = Integer.parseInt(cards[indexCartFrom].getBalance());
         int amount = 0;
 
-        var transferData = new TransferData(cards[indexCartFrom].getNumber(),
+        var transferData = new DataHelper.TransferData(cards[indexCartFrom].getNumber(),
                 cards[indexCartTo].getNumber(), String.valueOf(amount));
         transfer(transferData, token);
         assertEquals(balanceCartTo, getBalanceCardById(cards[indexCartTo].getId()));
@@ -102,7 +99,7 @@ public class TransferTest {
         balanceCartFrom = Integer.parseInt(cards[indexCartFrom].getBalance());
         int amount = 1;
 
-        var transferData = new TransferData(cards[indexCartFrom].getNumber(),
+        var transferData = new DataHelper.TransferData(cards[indexCartFrom].getNumber(),
                 cards[indexCartTo].getNumber(), String.valueOf(amount));
         transfer(transferData, token);
         assertEquals(balanceCartTo + amount, getBalanceCardById(cards[indexCartTo].getId()));
@@ -117,7 +114,7 @@ public class TransferTest {
         balanceCartFrom = Integer.parseInt(cards[indexCartFrom].getBalance());
         int amount = balanceCartFrom - 1;
 
-        var transferData = new TransferData(cards[indexCartFrom].getNumber(),
+        var transferData = new DataHelper.TransferData(cards[indexCartFrom].getNumber(),
                 cards[indexCartTo].getNumber(), String.valueOf(amount));
         transfer(transferData, token);
         assertEquals(balanceCartTo + amount, getBalanceCardById(cards[indexCartTo].getId()));
@@ -132,7 +129,7 @@ public class TransferTest {
         balanceCartFrom = Integer.parseInt(cards[indexCartFrom].getBalance());
         int amount = balanceCartFrom;
 
-        var transferData = new TransferData(cards[indexCartFrom].getNumber(),
+        var transferData = new DataHelper.TransferData(cards[indexCartFrom].getNumber(),
                 cards[indexCartTo].getNumber(), String.valueOf(amount));
         transfer(transferData, token);
         assertEquals(balanceCartTo + amount, getBalanceCardById(cards[indexCartTo].getId()));
@@ -148,7 +145,7 @@ public class TransferTest {
         balanceCartFrom = Integer.parseInt(cards[indexCartFrom].getBalance());
         int amount = balanceCartFrom + 1;
 
-        var transferData = new TransferData(cards[indexCartFrom].getNumber(),
+        var transferData = new DataHelper.TransferData(cards[indexCartFrom].getNumber(),
                 cards[indexCartTo].getNumber(), String.valueOf(amount));
         transfer(transferData, token);
         assertEquals(balanceCartTo, getBalanceCardById(cards[indexCartTo].getId()));
@@ -163,7 +160,7 @@ public class TransferTest {
         balanceCartFrom = Integer.parseInt(cards[indexCartFrom].getBalance());
         int amount = balanceCartFrom / 2;
 
-        var transferData = new TransferData(cards[indexCartFrom].getNumber(),
+        var transferData = new DataHelper.TransferData(cards[indexCartFrom].getNumber(),
                 cards[indexCartTo].getNumber(), String.valueOf(amount));
         transfer(transferData, token);
         assertEquals(balanceCartTo, getBalanceCardById(cards[indexCartTo].getId()));

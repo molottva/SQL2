@@ -5,10 +5,6 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
-import ru.netology.data.CardData;
-import ru.netology.data.TransferData;
-import ru.netology.data.UserData;
-import ru.netology.data.UserVerifyData;
 
 import static io.restassured.RestAssured.given;
 
@@ -21,7 +17,7 @@ public class APIHelper {
             .log(LogDetail.ALL)
             .build();
 
-    public static void auth(UserData userData) {
+    public static void auth(DataHelper.UserData userData) {
         Gson gson = new Gson();
         String user = gson.toJson(userData);
         given()
@@ -33,7 +29,7 @@ public class APIHelper {
                 .statusCode(200);
     }
 
-    public static String verification(UserVerifyData verifyData) {
+    public static String verification(DataHelper.VerifyCode verifyData) {
         Gson gson = new Gson();
         String verify = gson.toJson(verifyData);
         return given()
@@ -47,7 +43,7 @@ public class APIHelper {
                 .path("token");
     }
 
-    public static CardData[] getCards(String token) {
+    public static DataHelper.CardData[] getCards(String token) {
         spec.header("Authorization", "Bearer " + token);
         return given()
                 .spec(spec)
@@ -56,10 +52,10 @@ public class APIHelper {
                 .then()
                 .statusCode(200)
                 .extract()
-                .response().getBody().as(CardData[].class);
+                .response().getBody().as(DataHelper.CardData[].class);
     }
 
-    public static void transfer(TransferData transferData, String token) {
+    public static void transfer(DataHelper.TransferData transferData, String token) {
         Gson gson = new Gson();
         String transfer = gson.toJson(transferData);
         spec.header("Authorization", "Bearer " + token);
